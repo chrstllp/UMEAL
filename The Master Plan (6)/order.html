@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UMEAL - Orders</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .order-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px 0;
+      background-color: #f9f9f9;
+    }
+    .order-card h3 { margin: 0 0 5px 0; }
+    .order-card ul { padding-left: 20px; margin: 5px 0; }
+    .order-card button {
+      margin-top: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: none;
+      background-color: red;
+      color: white;
+    }
+    .status { font-weight: bold; }
+  </style>
+</head>
+<body class="dashboard-body">
+
+  <header class="top-bar">
+    <div class="user-info">
+      <img src="images/profile.jpg" alt="User" class="avatar">
+      <span>Hello, Via Sabatin!</span>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <h2>Your Orders</h2>
+    <div id="orders-list"></div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html">🍽 Food</a>
+    <a href="cart.html">🛒 Cart</a>
+    <a href="orders.html" class="active">📦 Order</a>
+    <a href="profile.html">👤 Profile</a>
+  </nav>
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const ordersContainer = document.querySelector('#orders-list');
+
+  // Load orders from localStorage
+  let orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+  function renderOrders() {
+    ordersContainer.innerHTML = '';
+
+    if (orders.length === 0) {
+      ordersContainer.innerHTML = "<p>No orders yet.</p>";
+      return;
+    }
+
+    orders.forEach((order, index) => {
+      const div = document.createElement('div');
+      div.className = 'order-card';
+      div.innerHTML = `
+        <h3>Order #${order.id}</h3>
+        <p>Pick-up Time: ${order.pickupTime}</p>
+        <p>Status: <span class="status">${order.status}</span></p>
+        <ul>
+          ${order.items.map(item => <li>${item.name} × ${item.quantity} = ₱${item.price * item.quantity}</li>).join('')}
+        </ul>
+        <p>Total: ₱${order.total}</p>
+        <button class="cancel-btn">Cancel</button>
+      `;
+      ordersContainer.appendChild(div);
+
+      // Cancel button updates status
+      div.querySelector('.cancel-btn').addEventListener('click', () => {
+        order.status = "Cancelled";
+        localStorage.setItem('orders', JSON.stringify(orders));
+        div.querySelector('.status').innerText = "Cancelled";
+      });
+    });
+  }
+
+  renderOrders();
+});
+</script>
+
+</body>
+</html>
